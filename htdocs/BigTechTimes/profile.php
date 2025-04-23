@@ -75,50 +75,61 @@ if (
     }
 }
 ?>
-<h2>Profile</h2>
-<?php if ($success): ?>
-  <div class="alert alert-success">Profile updated successfully.</div>
-<?php endif; ?>
-<?php if (!empty($errors)): ?>
-  <div class="alert alert-danger">
-    <ul>
-      <?php foreach ($errors as $error): ?>
-        <li><?= htmlspecialchars($error) ?></li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
-<?php endif; ?>
-<form method="post" action="profile.php" enctype="multipart/form-data">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <label class="form-label">Avatar</label>
-    <div>
-      <img src="<?= htmlspecialchars($user['avatar'] ?? 'uploads/default.png') ?>" alt="Avatar" class="img-thumbnail" width="100">
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fa fa-user me-2"></i>My Profile</h4>
+      </div>
+      <div class="card-body">
+        <?php if ($success): ?>
+          <div class="alert alert-success">Profile updated successfully.</div>
+        <?php endif; ?>
+        <?php if (!empty($errors)): ?>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endif; ?>
+        <form method="post" action="profile.php" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+          <div class="row mb-3">
+            <div class="col-md-3 text-center">
+              <img src="<?= htmlspecialchars($user['avatar'] ?? 'uploads/default.png') ?>" class="img-fluid rounded-circle mb-2" alt="Avatar">
+              <input type="file" name="avatar" accept="image/*" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-9">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($user['name']) ?>" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="<?= htmlspecialchars($user['email']) ?>" disabled>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Bio</label>
+                <textarea class="form-control" name="bio" rows="3"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Interests</label>
+            <input type="text" class="form-control" name="interests" value="<?= htmlspecialchars($user['interests'] ?? '') ?>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Social Links (JSON)</label>
+            <textarea class="form-control" name="social_links" rows="2"><?= htmlspecialchars($user['social_links'] ?? '') ?></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
     </div>
-    <input type="file" name="avatar" accept="image/*" class="form-control mt-2">
   </div>
-  <div class="mb-3">
-    <label class="form-label">Name</label>
-    <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($user['name']) ?>" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input type="email" class="form-control" value="<?= htmlspecialchars($user['email']) ?>" disabled>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Bio</label>
-    <textarea class="form-control" name="bio"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Interests</label>
-    <input type="text" class="form-control" name="interests" value="<?= htmlspecialchars($user['interests'] ?? '') ?>">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Social Links (JSON)</label>
-    <textarea class="form-control" name="social_links"><?= htmlspecialchars($user['social_links'] ?? '') ?></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary">Save Profile</button>
-</form>
+</div>
 <?php
 require_once __DIR__ . '/includes/footer.php';
 ?>

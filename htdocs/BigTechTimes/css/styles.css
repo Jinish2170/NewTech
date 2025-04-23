@@ -1,0 +1,71 @@
+/* styles.css: custom theme overrides */
+body {
+  font-family: 'Roboto Mono', monospace;
+  background: #f4f6f8;
+  color: #333;
+}
+.navbar {
+  border-bottom: 2px solid #eaeaea;
+}
+.container {
+  max-width: 1200px;
+}
+.card {
+  border: none;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+a {
+  color: #0d6efd;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: #0a58ca;
+}
+.btn {
+  transition: transform 0.1s ease;
+}
+.btn:hover {
+  transform: scale(1.03);
+}
+.chat-messages {
+  background: #fff;
+  border-radius: 8px;
+  transition: background 0.3s;
+  position: relative;
+}
+.chat-messages:hover {
+  background: #f9f9f9;
+}
+/* Scrollbar styling for chat area */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+/* Chat bubble styling */
+.chat-bubble {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+  max-width: 75%;
+}
+.chat-incoming {
+  background: #e9ecef;
+  color: #333;
+  float: left;
+  clear: both;
+}
+.chat-outgoing {
+  background: #0d6efd;
+  color: #fff;
+  float: right;
+  clear: both;
+}

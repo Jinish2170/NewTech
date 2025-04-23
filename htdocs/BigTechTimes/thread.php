@@ -44,41 +44,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && validate_csrf_token($_POST['csrf_to
     }
 }
 ?>
-<?php if (!$thread_id): ?>
-<h2>Create New Thread</h2>
-<form method="post" action="thread.php">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <label class="form-label">Title</label>
-    <input type="text" class="form-control" name="title" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Body</label>
-    <textarea class="form-control" name="body" rows="5" required></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary">Post Thread</button>
-</form>
-<?php else: ?>
-<h2><?= htmlspecialchars($thread['title']) ?></h2>
-<p><?= nl2br(htmlspecialchars($thread['body'])) ?></p>
-<small>by <?= htmlspecialchars($thread['name']) ?> on <?= $thread['created_at'] ?></small>
-<hr>
-<h4>Replies</h4>
-<?php foreach ($posts as $post): ?>
-  <div class="card mb-2">
-    <div class="card-body">
-      <p><?= nl2br(htmlspecialchars($post['body'])) ?></p>
-      <small>by <?= htmlspecialchars($post['name']) ?> on <?= $post['created_at'] ?></small>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <?php if (!$thread_id): ?>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fa fa-pencil-alt me-2"></i>Create New Thread</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" action="thread.php">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Body</label>
+            <textarea class="form-control" name="body" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Post Thread</button>
+        </form>
+      </div>
     </div>
+    <?php else: ?>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h4 class="mb-0"><i class="fa fa-comments me-2"></i><?= htmlspecialchars($thread['title']) ?></h4>
+        <small class="text-muted">by <?= htmlspecialchars($thread['name']) ?> on <?= $thread['created_at'] ?></small>
+      </div>
+      <div class="card-body">
+        <p><?= nl2br(htmlspecialchars($thread['body'])) ?></p>
+      </div>
+    </div>
+    <h5 class="mb-3"><i class="fa fa-reply me-2"></i>Replies</h5>
+    <?php foreach ($posts as $post): ?>
+      <div class="card mb-3">
+        <div class="card-body">
+          <p><?= nl2br(htmlspecialchars($post['body'])) ?></p>
+          <div class="small text-muted">by <?= htmlspecialchars($post['name']) ?> on <?= $post['created_at'] ?></div>
+        </div>
+      </div>
+    <?php endforeach; ?>
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fa fa-comment-alt me-2"></i>Post a Reply</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" action="thread.php?id=<?= $thread_id ?>">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+          <div class="mb-3">
+            <textarea class="form-control" name="body" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Reply</button>
+        </form>
+      </div>
+    </div>
+    <?php endif; ?>
   </div>
-<?php endforeach; ?>
-<h4>Reply</h4>
-<form method="post" action="thread.php?id=<?= $thread_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <textarea class="form-control" name="body" rows="3" required></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary">Post Reply</button>
-</form>
-<?php endif; ?>
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+</div>
+<?php require_once __DIR__ . '/includes/footer.php';?>

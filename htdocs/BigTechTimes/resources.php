@@ -30,30 +30,48 @@ $stmt = $conn->prepare("SELECT r.id, r.title, r.file_path, u.name, r.created_at 
 $stmt->execute();
 $resources = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
-<h2>Resource Library</h2>
-<h4>Upload Resource</h4>
-<form method="post" action="resources.php" enctype="multipart/form-data">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <label class="form-label">Title</label>
-    <input type="text" class="form-control" name="title" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">File</label>
-    <input type="file" class="form-control" name="resource_file" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Upload</button>
-</form>
-<hr>
-<h4>Available Resources</h4>
-<ul class="list-group">
-<?php foreach ($resources as $res): ?>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <div>
-      <strong><?= htmlspecialchars($res['title']) ?></strong> by <?= htmlspecialchars($res['name']) ?> on <?= $res['created_at'] ?>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fa fa-folder-open me-2"></i>Resource Library</h4>
+      </div>
+      <div class="card-body">
+        <h5 class="mb-3">Upload New Resource</h5>
+        <form method="post" action="resources.php" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">File</label>
+            <input type="file" class="form-control" name="resource_file" required>
+          </div>
+          <button type="submit" class="btn btn-info">Upload</button>
+        </form>
+        <hr>
+        <h5 class="mb-3">Available Resources</h5>
+        <?php if (empty($resources)): ?>
+          <p class="text-muted">No resources uploaded yet.</p>
+        <?php else: ?>
+          <div class="list-group">
+            <?php foreach ($resources as $res): ?>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fa fa-file-alt me-2"></i>
+                  <strong><?= htmlspecialchars($res['title']) ?></strong>
+                  <div class="small text-muted">by <?= htmlspecialchars($res['name']) ?> on <?= $res['created_at'] ?></div>
+                </div>
+                <a href="<?= htmlspecialchars($res['file_path']) ?>" class="btn btn-sm btn-outline-primary" download>
+                  <i class="fa fa-download"></i> Download
+                </a>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
     </div>
-    <a href="<?= htmlspecialchars($res['file_path']) ?>" class="btn btn-sm btn-outline-secondary" download>Download</a>
-  </li>
-<?php endforeach; ?>
-</ul>
-<?php require_once __DIR__ . '/includes/footer.php';?>
+  </div>
+</div>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

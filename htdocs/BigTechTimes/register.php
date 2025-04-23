@@ -39,7 +39,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)');
             $stmt->bind_param('sss', $name, $email, $password_hash);
             if ($stmt->execute()) {
-                header('Location: login.php?registered=1');
+                // Generate verification token
+                $userId = $stmt->insert_id;
+                $token = bin2hex(random_bytes(16));
+                $stmt2 = $conn->prepare('UPDATE users SET verify_token = ? WHERE id = ?');
+                $stmt2->bind_param('si', $token, $userId);
+                $stmt2->execute();
+                // Send verification email
+                $verifyLink = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/verify.php?token=$token";
+                $subject = 'Verify your BigTechTimes account';
+                $message = "Hi $name,\n\nPlease click the link below to verify your email address and activate your account:\n$verifyLink\n\nThanks!";
+                $headers = 'From: no-reply@bigtechtimes.local' . "\r\n";
+                mail($email, $subject, $message, $headers);
+                // Redirect to login with message
+                header('Location: login.php?verify=sent');
                 exit;
             } else {
                 $errors[] = 'Registration failed, please try again';
@@ -48,34 +61,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<h2>Register</h2>
-<?php if ($errors): ?>
-  <div class="alert alert-danger">
-    <ul>
-      <?php foreach ($errors as $error): ?>
-        <li><?= htmlspecialchars($error) ?></li>
-      <?php endforeach; ?>
-    </ul>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Register</h4>
+      </div>
+      <div class="card-body">
+        <?php if ($errors): ?>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endif; ?>
+        <form method="post" action="register.php">
+          <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($name ?? '') ?>" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required minlength="8">
+          </div>
+          <div class="mb-3">
+            <label for="password_confirm" class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required minlength="8">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Create Account</button>
+        </form>
+      </div>
+      <div class="card-footer text-center">
+        Already have an account? <a href="login.php">Login here</a>
+      </div>
+    </div>
   </div>
-<?php endif; ?>
-<form method="post" action="register.php">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($name ?? '') ?>" required>
-  </div>
-  <div class="mb-3">
-    <label for="email" class="form-label">Email</label>
-    <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="password" name="password" required>
-  </div>
-  <div class="mb-3">
-    <label for="password_confirm" class="form-label">Confirm Password</label>
-    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Register</button>
-</form>
+</div>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -17,6 +17,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && validate_csrf_token($_POST['csrf_to
     exit;
 }
 
+// Handle AJAX polling for new messages
+if (isset($_GET['poll']) && $_GET['poll'] == '1' && is_logged_in()) {
+    $other = intval($_GET['user_id']);
+    header('Content-Type: application/json');
+    $stmt = $conn->prepare("SELECT m.sender_id, m.body, m.sent_at, u.name
+        FROM messages m JOIN users u ON m.sender_id=u.id
+        WHERE (sender_id=? AND receiver_id=?) OR (sender_id=? AND receiver_id=?)
+        ORDER BY m.sent_at");
+    $stmt->bind_param('iiii', $current_id, $other, $other, $current_id);
+    $stmt->execute();
+    $msgs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    ob_start();
+    foreach ($msgs as $msg) {
+        echo '<div class="mb-2 text-'.($msg['sender_id']==$current_id?'end':'start').'">';
+        echo '<strong>'.htmlspecialchars($msg['name']).':</strong> '.nl2br(htmlspecialchars($msg['body']));
+        echo '<br><small>'.$msg['sent_at'].'</small>';
+        echo '</div>';
+    }
+    $html = ob_get_clean();
+    echo json_encode(['html'=>$html]);
+    exit;
+}
+
 // Fetch users for chat list
 $stmt = $conn->prepare("SELECT id, name FROM users WHERE id != ?");
 $stmt->bind_param('i', $current_id);
@@ -53,7 +76,7 @@ if ($selected_id) {
   <div class="col-md-8">
     <?php if ($selected_id): ?>
       <h5>Conversation with <?= htmlspecialchars($selected_name) ?></h5>
-      <div class="border rounded p-3 mb-3" style="height:400px; overflow-y:scroll;">
+      <div class="border rounded p-3 mb-3 chat-messages" style="height:400px; overflow-y:scroll;">
         <?php foreach ($messages as $msg): ?>
           <div class="mb-2 text-<?php echo $msg['sender_id'] == $current_id ? 'end' : 'start'; ?>">
             <strong><?= htmlspecialchars($msg['name']) ?>:</strong> <?= nl2br(htmlspecialchars($msg['body'])) ?>

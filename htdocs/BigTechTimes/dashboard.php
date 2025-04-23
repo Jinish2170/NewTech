@@ -18,40 +18,61 @@ $stmt = $conn->prepare("SELECT id, title, event_date FROM events WHERE event_dat
 $stmt->execute();
 $events = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
-<h2>Dashboard</h2>
-<div class="row">
+<h2 class="mb-4"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</h2>
+<div class="row g-4">
   <div class="col-md-4">
-    <h4>Recent Threads</h4>
-    <ul class="list-group">
-      <?php foreach ($threads as $thread): ?>
-        <li class="list-group-item">
-          <a href="thread.php?id=<?= $thread['id'] ?>"><?= htmlspecialchars($thread['title']) ?></a>
-          <br><small>by <?= htmlspecialchars($thread['name']) ?> on <?= $thread['created_at'] ?></small>
-        </li>
-      <?php endforeach; ?>
-    </ul>
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <i class="fa fa-comments me-2"></i>Recent Threads
+      </div>
+      <ul class="list-group list-group-flush">
+        <?php foreach ($threads as $thread): ?>
+          <li class="list-group-item">
+            <a href="thread.php?id=<?= $thread['id'] ?>"><?= htmlspecialchars($thread['title']) ?></a>
+            <div class="small text-muted">by <?= htmlspecialchars($thread['name']) ?> on <?= $thread['created_at'] ?></div>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+      <div class="card-footer text-end">
+        <a href="forum.php" class="btn btn-sm btn-outline-light">View All</a>
+      </div>
+    </div>
   </div>
   <div class="col-md-4">
-    <h4>Latest Blogs</h4>
-    <ul class="list-group">
-      <?php foreach ($blogs as $blog): ?>
-        <li class="list-group-item">
-          <a href="post.php?blog_id=<?= $blog['id'] ?>"><?= htmlspecialchars($blog['title']) ?></a>
-          <br><small>by <?= htmlspecialchars($blog['name']) ?> on <?= $blog['created_at'] ?></small>
-        </li>
-      <?php endforeach; ?>
-    </ul>
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-success text-white">
+        <i class="fa fa-newspaper me-2"></i>Latest Blogs
+      </div>
+      <ul class="list-group list-group-flush">
+        <?php foreach ($blogs as $blog): ?>
+          <li class="list-group-item">
+            <a href="post.php?id=<?= $blog['id'] ?>"><?= htmlspecialchars($blog['title']) ?></a>
+            <div class="small text-muted">by <?= htmlspecialchars($blog['name']) ?> on <?= $blog['created_at'] ?></div>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+      <div class="card-footer text-end">
+        <a href="blog.php" class="btn btn-sm btn-outline-light">View All</a>
+      </div>
+    </div>
   </div>
   <div class="col-md-4">
-    <h4>Upcoming Events</h4>
-    <ul class="list-group">
-      <?php foreach ($events as $event): ?>
-        <li class="list-group-item">
-          <?= htmlspecialchars($event['title']) ?>
-          <br><small><?= $event['event_date'] ?></small>
-        </li>
-      <?php endforeach; ?>
-    </ul>
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-warning text-dark">
+        <i class="fa fa-calendar-alt me-2"></i>Upcoming Events
+      </div>
+      <ul class="list-group list-group-flush">
+        <?php foreach ($events as $event): ?>
+          <li class="list-group-item">
+            <?= htmlspecialchars($event['title']) ?>
+            <div class="small text-muted"><?= $event['event_date'] ?></div>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+      <div class="card-footer text-end">
+        <a href="events.php" class="btn btn-sm btn-outline-dark">View Calendar</a>
+      </div>
+    </div>
   </div>
 </div>
 <?php require_once __DIR__ . '/includes/footer.php';?>

@@ -42,39 +42,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && validate_csrf_token($_POST['csrf_to
     }
 }
 ?>
-<?php if (!$blog_id && is_admin()): ?>
-<h2>Create New Blog Post</h2>
-<form method="post" action="post.php">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <label class="form-label">Title</label>
-    <input type="text" class="form-control" name="title" required>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <?php if (!$blog_id && is_admin()): ?>
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0"><i class="fa fa-pencil-alt me-2"></i>Create New Blog Post</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" action="post.php">
+            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Body</label>
+              <textarea class="form-control" name="body" rows="6" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Publish</button>
+          </form>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($blog_id): ?>
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h4 class="mb-0"><i class="fa fa-newspaper me-2"></i><?= htmlspecialchars($post['title']) ?></h4>
+          <small class="text-muted">by <?= htmlspecialchars($post['name']) ?> on <?= $post['created_at'] ?></small>
+        </div>
+        <div class="card-body">
+          <p><?= nl2br(htmlspecialchars($post['body'])) ?></p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0"><i class="fa fa-comments me-2"></i>Comments</h5>
+        </div>
+        <div class="card-body">
+          <?php if (empty($comments)): ?>
+            <p class="text-muted">No comments yet.</p>
+          <?php else: ?>
+            <?php foreach ($comments as $comment): ?>
+              <div class="mb-3">
+                <p><?= nl2br(htmlspecialchars($comment['body'])) ?></p>
+                <div class="small text-muted">by <?= htmlspecialchars($comment['name']) ?> on <?= $comment['created_at'] ?></div>
+                <hr>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+          <h5><i class="fa fa-reply me-2"></i>Add Comment</h5>
+          <form method="post" action="post.php?id=<?= $blog_id ?>">
+            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+            <div class="mb-3">
+              <textarea class="form-control" name="body" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+          </form>
+        </div>
+      </div>
+    <?php endif; ?>
   </div>
-  <div class="mb-3">
-    <label class="form-label">Body</label>
-    <textarea class="form-control" name="body" rows="6" required></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary">Publish</button>
-</form>
-<?php elseif ($blog_id): ?>
-<h2><?= htmlspecialchars($post['title']) ?></h2>
-<p><?= nl2br(htmlspecialchars($post['body'])) ?></p>
-<small>by <?= htmlspecialchars($post['name']) ?> on <?= $post['created_at'] ?></small>
-<hr>
-<h4>Comments</h4>
-<?php foreach ($comments as $comment): ?>
-  <div class="card mb-2"><div class="card-body">
-    <p><?= nl2br(htmlspecialchars($comment['body'])) ?></p>
-    <small>by <?= htmlspecialchars($comment['name']) ?> on <?= $comment['created_at'] ?></small>
-  </div></div>
-<?php endforeach; ?>
-<h4>Add Comment</h4>
-<form method="post" action="post.php?id=<?= $blog_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-  <div class="mb-3">
-    <textarea class="form-control" name="body" rows="3" required></textarea>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit Comment</button>
-</form>
-<?php endif; ?>
+</div>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
